@@ -1,0 +1,31 @@
+{
+  "name": "forward-authentication-service",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "An authentication service to handle traefik forwardAuth",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app.js",
+    "start:dev": "nodemon -L app.js"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "./users.json"
+    ]
+  },
+  "dependencies": {
+    "argon2": "^0.31.2",
+    "fastify": "^4.26.1",
+    "mongodb": "6.3",
+    "nodemon": "^3.0.3"
+  },
+  "keywords": [
+    "authentication",
+    "forwardAuth",
+    "middleware",
+    "traefik"
+  ],
+  "author": "Aljosha Merz",
+  "license": "ISC"
+}

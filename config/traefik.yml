@@ -1,0 +1,32 @@
+accessLog:
+  filePath: "/var/logs/access.log"
+  bufferingSize: 100
+  filters:
+    statusCodes:
+      - "400-449"
+      - "500-511"
+
+log:
+  filePath: "/var/logs/traefik.log"
+
+providers:
+  file:
+    directory: /etc/traefik
+    watch: true
+
+api:
+  dashboard: true
+  insecure: false
+
+entryPoints:
+  web:
+    address: ":80"
+  websecure:
+    address: ":443"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: aljosha.merz@pferd.com
+      storage: /letsencrypt/acme.json
+      tlsChallenge: {}

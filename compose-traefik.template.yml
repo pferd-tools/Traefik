@@ -1,0 +1,50 @@
+version: "3.9"
+services:
+  auth:
+    hostname: traefikAuth
+    container_name: traefik-auth
+    build: forwardAuth
+    volumes:
+      - ./forwardAuth:/usr/src/app
+      - /usr/src/app/node_modules
+    env_file: .env
+    networks:
+      - ${NETWORK_NAME}
+
+  db:
+    hostname: traefikDB
+    container_name: traefik-db
+    image: mongo
+    restart: always
+    env_file: .env
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: traefik
+    volumes:
+      - dbData:/data/db
+    networks:
+      - ${NETWORK_NAME}
+
+  traefik:
+    image: traefik
+    container_name: traefik-proxy
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config:/etc/traefik
+      - ./logs:/var/logs
+    networks:
+      - ${NETWORK_NAME}
+
+
+volumes:
+  dbData:
+
+networks:
+ ${NETWORK_NAME}:
+    external: true

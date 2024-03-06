@@ -1,0 +1,3 @@
+stripprefix:
+  forceSlash: false
+  prefixes: ${PREFIXES}

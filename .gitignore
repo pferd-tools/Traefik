@@ -1,0 +1,11 @@
+.idea/
+logs/
+db/data
+**/node_modules/
+services.js
+compose-traefik.yml
+compse-forwardAuth.yml
+config/acme.json
+.env
+config/dynamicConf.yml
+generated-compose-traefik.yml

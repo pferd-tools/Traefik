@@ -1,0 +1,2 @@
+forwardAuth:
+  address: "http://traefikAuth:3000/"

@@ -1,0 +1,21 @@
+headers:
+  accessControlAllowMethods:
+    - GET
+    - PUT
+    - POST
+    - PATCH
+    - HEAD
+    - OPTIONS
+  accessControlAllowCredentials: true
+  accessControlAllowHeaders:
+    - accept
+    - authorization
+    - content-type
+    - origin
+    - referer
+  accessControlAllowOriginList:
+    - "*"
+  accessControlMaxAge: 100
+  addVaryHeader: true
+  customResponseHeaders:
+    Access-Control-Allow-Origin: "*"
