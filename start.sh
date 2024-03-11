@@ -71,8 +71,8 @@ if [ -z "$PROJECT_NAME" ]; then
 fi
 
 if [ "$CMD" = "down" ] && [ -f "generated-compose-traefik.yml" ]; then
-  docker-compose -f generated-compose-traefik.yml -p "$PROJECT_NAME" &> /dev/null
-  docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" &> /dev/null
+  docker-compose -f generated-compose-traefik.yml -p "$PROJECT_NAME" down &> /dev/null
+  docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" down &> /dev/null
   echo "Stopped all Traefik services"
 else
   if [ "$CMD" = "down" ]; then
