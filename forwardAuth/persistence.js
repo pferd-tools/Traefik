@@ -3,8 +3,7 @@ import { MongoClient, ServerApiVersion } from 'mongodb'
 
 const COL = 'users'
 const base = '$argon2id$v=19$m=65536,t=3,p=4$'
-const {MONGO_INITDB_ROOT_USERNAME: username,MONGO_INITDB_ROOT_PASSWORD:password} = process.env
-const uri = `mongodb://${[username,password].join(':')}@traefikDB:27017`
+const uri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@traefikDB:27017`
 const client = new MongoClient(uri, {
     serverApi: {
         version: ServerApiVersion.v1,
