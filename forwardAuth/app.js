@@ -18,7 +18,7 @@ server.get('/', async (req, res) => {
 		res.header('Www-Authenticate', `Basic realm="traefik"`);
 		res.status(code).send(msg)
 	}
-	else res.status(200).send(msg)
+	else res.status(code).send(msg)
 });
 
 server.get('/user', async (req, res) => {

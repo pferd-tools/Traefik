@@ -95,9 +95,13 @@ export function getHashString(name,password){
 }
 
 async function getUsersList(){
-    const users = await db.collection(COL).find().toArray()
-    if(!users) return []
-    return users
+    try {
+        const users = await db.collection(COL).find().toArray()
+        if(!users) throw 'Now users!'
+        return users
+    }catch (e){
+        return []
+    }
 }
 
 export async function getUser(name = null) {
