@@ -3,7 +3,7 @@ import PATH from 'path'
 import 'dotenv/config'
 import { interpolation } from 'interpolate-json';
 import YAML from 'js-yaml';
-import {DOMAIN} from "./exports.js";
+import {DOMAIN, MIDDLEWARES} from "./exports.js";
 import defaultServices from "./defaultServices.js";
 
 async function generate(){
@@ -48,7 +48,7 @@ async function generate(){
 		}
 	}
 	services.forEach(def => {
-		const {name,entryPoints,middlewares = [],url = [],servers,useTls = false,isTcp = false} = def
+		const {name,entryPoints,middlewares = [],url = [],servers,isTcp = false} = def
 		const hasServers = !!servers && servers.length > 0
 		let service
 		if(hasServers) service = `${name}-service`
@@ -68,7 +68,7 @@ async function generate(){
 			routerDef.rule = rules.join(' && ')
 			if(hasServers) prefixes.push(`/${path}`)
 		}
-		if(useTls){
+		if(middlewares.some(mw => mw === MIDDLEWARES.redirectHttps)){
 			routerDef.tls = {
 				certResolver: 'letsencrypt'
 			}
