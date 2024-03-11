@@ -1,0 +1,13 @@
+version: "3.9"
+services:
+  traefik-test:
+    image: alchen99/express-hello
+    hostname: traefikTest
+    container_name: traefik-test
+    restart: no
+    networks:
+      - ${NETWORK_NAME}
+
+networks:
+  ${NETWORK_NAME}:
+    external: true

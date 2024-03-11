@@ -18,7 +18,7 @@ server.get('/', async (req, res) => {
 		res.header('Www-Authenticate', `Basic realm="traefik"`);
 		res.status(code).send(msg)
 	}
-	else res.status(200)
+	else res.status(200).send(msg)
 });
 
 server.get('/user', async (req, res) => {
@@ -47,8 +47,7 @@ server.delete('/user/:name', async (req, res) => {
 		res.status(200).send(`Deleted user ${name}`)
 	}
 	catch (err) {
-		const {code} = err
-		res.status(code).send('Cannot delete non existent user!')
+		res.status(400).send('Cannot delete non existent user!')
 	}
 });
 

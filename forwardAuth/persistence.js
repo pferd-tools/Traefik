@@ -114,12 +114,12 @@ export async function getUser(name = null) {
         if (!user) {
             throw {
                 code: 404,
-                msg: 'User not found!'
+                msg: 'Specified user not found!'
             }
         }
         return user
     }
-    if(users) return users.map(u => u.name)
+    return users.map(u => u.name)
 }
 
 export async function updateUser(name,password){
@@ -132,14 +132,14 @@ export async function updateUser(name,password){
         const user = await getUser(name)
         await db.collection(COL).updateOne({_id: user._id},{$set:{name,password: newUser.password}})
         returnObj = {
-            code: 201,
+            code: 200,
             msg: `Updated user ${user.name} with a new password`
         }
     }
     catch (err) {
         await saveUser(newUser)
         returnObj = {
-            code: 200,
+            code: 201,
             msg: `Added user ${name}`
         }
     }

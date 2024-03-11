@@ -1,4 +1,4 @@
-import {DOMAIN, SUB_DOMAIN, ENTRYPOINTS, MIDDLEWARES} from './exports.js'
+import {DOMAIN, ENTRYPOINTS, MIDDLEWARES} from './exports.js'
 
 export default [
   ...['dashboard'].map(name => {
@@ -12,11 +12,10 @@ export default [
   ...['traefikAuth'].map(name => {
     return {
       name,
-      entryPoints: [ENTRYPOINTS.WEB_SECURE],
-      middlewares: [MIDDLEWARES.stripPrefix,MIDDLEWARES.redirectHttps],
+      entryPoints: [ENTRYPOINTS.WEB],
+      middlewares: [MIDDLEWARES.stripPrefix],
       url: [DOMAIN, 'traefik/auth'],
-      servers: [`http://${name}:3000`],
-      useTls: true
+      servers: [`http://${name}:3000`]
     }
   })
 ]

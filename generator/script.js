@@ -28,7 +28,7 @@ async function generate(){
 					if(overwriteService){
 						for(const key in service){
 							const value = service[key]
-							if(Array.isArray(value) && key in overwriteService && key !== 'url'){
+							if(Array.isArray(value) && key in overwriteService && key === 'middlewares'){
 								value.forEach(val => {
 									if(!overwriteService[key].includes(val)) {
 										overwriteService[key].push(val)
@@ -38,6 +38,7 @@ async function generate(){
 							else overwriteService[key] = value
 						}
 					}
+					else services.push(service)
 				})
 			}
 			else throw new Error()

@@ -8,4 +8,4 @@ export const MIDDLEWARES = {
 	redirectHttps: 'redirectHttps',
 	addCors: 'addCors'
 }
-export const {DOMAIN,SUB_DOMAIN} = process.env
+export const {DOMAIN} = process.env

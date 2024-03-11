@@ -17,10 +17,11 @@ services:
     image: mongo
     restart: always
     env_file: .env
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${DB_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${DB_PASSWORD}
     ports:
       - "27017:27017"
-    environment:
-      MONGO_INITDB_DATABASE: traefik
     volumes:
       - dbData:/data/db
     networks:
@@ -40,7 +41,6 @@ services:
       - ./logs:/var/logs
     networks:
       - ${NETWORK_NAME}
-
 
 volumes:
   dbData:
