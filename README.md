@@ -1,3 +1,3 @@
 # Traefik Proxy System
 
-Dokumentation unter [Web Services](https://pferd.atlassian.net/wiki/external/YmUxMmEzYmZjMTgxNGJjY2JhZmY1MjY4N2U4MzNmMWU)
+[Dokumentation lesen](https://pferd.atlassian.net/wiki/spaces/SD/pages/38666287/Traefik+Proxy+System)
