@@ -7,4 +7,5 @@ services:
     restart: 'no'
     volumes:
       - ./config:/usr/src/traefik
+      - ${EXPORT_SERVICES_DIR}:/usr/src/app/monitor
       - ${PWD}/services.js:/usr/src/app/services.js

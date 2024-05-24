@@ -3,7 +3,7 @@ import PATH from 'path'
 import 'dotenv/config'
 import { interpolation } from 'interpolate-json';
 import YAML from 'js-yaml';
-import {DOMAIN, MIDDLEWARES} from "./exports.js";
+import {DOMAIN, ENTRYPOINTS, MIDDLEWARES} from "./exports.js";
 import defaultServices from "./defaultServices.js";
 
 async function generate(){
@@ -93,13 +93,27 @@ async function generate(){
 		acc = {...acc, [name.split('.')[0]]: json}
 		return acc
 	},{})
-	return json
+	return {json,services}
 }
 
-generate().then(json => {
+generate().then(({json,services}) => {
 	const outputDir = '/usr/src/traefik'
 	fs.ensureDir(outputDir).then(() => {
 		fs.writeFileSync(PATH.join(outputDir,`dynamicConf.yml`),YAML.dump(json))
 		console.log('All dynamic configurations written')
+		if(process.env.EXPORT_SERVICES_DIR !== '/dev/null'){
+			console.log('Starting export of services')
+			const dir = PATH.resolve('monitor')
+			fs.ensureDir(dir).then(() => {
+				const content = services.map(service => {
+					const {displayName:name,entryPoints,url,expectedCode = 200,middlewares = []} = service
+					const useAuth = middlewares.includes(MIDDLEWARES.forwardAuth)
+					url[0] = `http${entryPoints.includes(ENTRYPOINTS.WEB_SECURE) ? 's' : ''}://${'85.214.37.62'/*url[0]*/}`
+					return {name,url:url.join('/'),expectedCode,useAuth}
+				})
+				fs.writeFileSync(PATH.join(dir,'traefikServices.js'),`module.exports = ${JSON.stringify(content)}`)
+				console.log('Finished export of services')
+			})
+		}
 	})
 })

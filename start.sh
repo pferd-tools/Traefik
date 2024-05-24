@@ -1,13 +1,17 @@
 #!/bin/bash
 
-GREEN='\033[42m'
-NC='\033[0m'
-
 CMD="start"
 USE_FORCE=false
+USE_TEST=false
 NETWORK_NAME="${NETWORK_NAME:-"traefik"}"
 PROJECT_NAME="${PROJECT_NAME:-""}"
-USE_TEST=false
+CONTENTS=$(grep "EXPORT_SERVICES_DIR=*" < .env)
+
+if [[ -z "$CONTENTS" ]]; then
+    EXPORT_SERVICES_DIR="/dev/null"
+else
+    EXPORT_SERVICES_DIR=$(echo "$CONTENTS" | cut -d'=' -f2 | tr -d '[:space:]')
+fi
 
 raiseError() {
     if [ -z "$2" ]; then
@@ -80,8 +84,10 @@ else
   fi
 
   logger "Starting generation"
-  docker-compose -f compose-generator.yml -p "$PROJECT_NAME" up --build
-  docker-compose -f compose-generator.yml -p "$PROJECT_NAME" down &> /dev/null
+  export EXPORT_SERVICES_DIR="$EXPORT_SERVICES_DIR"
+  envsubst < compose-generator.template.yml > generated-compose-generator.yml
+  docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" up --build
+  docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" down &> /dev/null
 
   if [ "$CMD" != "generate" ]; then
       if [ "$USE_FORCE" == true ]; then

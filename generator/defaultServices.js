@@ -4,6 +4,7 @@ export default [
   ...['dashboard'].map(name => {
     return {
       name,
+      displayName:'Trafik Dashboard',
       entryPoints: [ENTRYPOINTS.WEB],
       url: [DOMAIN],
       servers: []
@@ -12,6 +13,7 @@ export default [
   ...['traefikAuth'].map(name => {
     return {
       name,
+      displayName:'Traefik Authentifizierung',
       entryPoints: [ENTRYPOINTS.WEB],
       middlewares: [MIDDLEWARES.stripPrefix],
       url: [DOMAIN, 'traefik/auth'],
