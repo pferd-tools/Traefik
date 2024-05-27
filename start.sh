@@ -110,6 +110,9 @@ else
   docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" up --build
   docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" down &> /dev/null
 
+  unset SERVICES_CONFIG_FILE
+  unset SERVICES_EXPORTED_FILE
+
   if [ "$CMD" != "generate" ]; then
       if [ "$USE_FORCE" == true ]; then
           TRAEFIK_STATUS=""
