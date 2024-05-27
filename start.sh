@@ -86,7 +86,7 @@ if ! test -f "$SERVICES_CONFIG_FILE"; then
 fi
 
 if [[ ! -f "$SERVICES_EXPORTED_FILE" ]] && [[ "$SERVICES_EXPORTED_FILE" != "/dev/null" ]]; then
-  sudo touch "$SERVICES_EXPORTED_FILE"
+  touch "$SERVICES_EXPORTED_FILE"
 fi
 
 if [ -z "$PROJECT_NAME" ]; then
