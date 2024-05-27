@@ -5,13 +5,6 @@ USE_FORCE=false
 USE_TEST=false
 NETWORK_NAME="${NETWORK_NAME:-"traefik"}"
 PROJECT_NAME="${PROJECT_NAME:-""}"
-CONTENTS=$(grep "EXPORT_SERVICES_DIR=*" < .env)
-
-if [[ -z "$CONTENTS" ]]; then
-    EXPORT_SERVICES_DIR="/dev/null"
-else
-    EXPORT_SERVICES_DIR=$(echo "$CONTENTS" | cut -d'=' -f2 | tr -d '[:space:]')
-fi
 
 raiseError() {
     if [ -z "$2" ]; then
@@ -33,6 +26,16 @@ logger() {
     printf '%*s\n' "$width" | tr ' ' $separator
     printf '%*s\n' "$padding" "${bg_color}${text}${reset_color}"
     printf '%*s\n' "$width" | tr ' ' $separator
+}
+
+extractEnvVariable() {
+    CONTENTS=$(grep "$1=*" < .env)
+
+    if [[ -z "$CONTENTS" ]]; then
+        echo "/dev/null"
+    else
+        echo "$CONTENTS" | cut -d'=' -f2 | tr -d '[:space:]'
+    fi
 }
 
 while [ $# -gt 0 ]; do
@@ -70,6 +73,22 @@ while [ $# -gt 0 ]; do
     esac
 done
 
+SERVICES_CONFIG_FILE=$(extractEnvVariable "SERVICES_CONFIG_FILE")
+SERVICES_EXPORTED_FILE=$(extractEnvVariable "SERVICES_EXPORTED_FILE")
+
+#!/bin/bash
+
+if ! test -f "$SERVICES_CONFIG_FILE"; then
+  echo "Die Services Config Datei existiert nicht. Es werden keine benutzerdefinierten Services generiert."
+  echo "Die Datei wird in $SERVICES_CONFIG_FILE erstellt"
+  printf "\n"
+  sudo touch "$SERVICES_CONFIG_FILE"
+fi
+
+if [[ ! -f "$SERVICES_EXPORTED_FILE" ]] && [[ "$SERVICES_EXPORTED_FILE" != "/dev/null" ]]; then
+  sudo touch "$SERVICES_EXPORTED_FILE"
+fi
+
 if [ -z "$PROJECT_NAME" ]; then
     PROJECT_NAME="$NETWORK_NAME"
 fi
@@ -84,7 +103,9 @@ else
   fi
 
   logger "Starting generation"
-  export EXPORT_SERVICES_DIR="$EXPORT_SERVICES_DIR"
+  export SERVICES_CONFIG_FILE="$SERVICES_CONFIG_FILE"
+  export SERVICES_EXPORTED_FILE="$SERVICES_EXPORTED_FILE"
+
   envsubst < compose-generator.template.yml > generated-compose-generator.yml
   docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" up --build
   docker-compose -f generated-compose-generator.yml -p "$PROJECT_NAME" down &> /dev/null

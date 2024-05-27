@@ -101,17 +101,22 @@ generate().then(({json,services}) => {
 	fs.ensureDir(outputDir).then(() => {
 		fs.writeFileSync(PATH.join(outputDir,`dynamicConf.yml`),YAML.dump(json))
 		console.log('All dynamic configurations written')
-		if(process.env.EXPORT_SERVICES_DIR !== '/dev/null'){
+		if(process.env.EXPORTED_SERVICES_FILE !== '/dev/null'){
 			console.log('Starting export of services')
 			const dir = PATH.resolve('monitor')
+			const ignoredKeys = ['name','displayName','entryPoints','middlewares','url','servers']
 			fs.ensureDir(dir).then(() => {
 				const content = services.map(service => {
-					const {displayName:name,entryPoints,url,expectedCode = 200,middlewares = []} = service
+					const {displayName:name,entryPoints,url,middlewares = []} = service
 					const useAuth = middlewares.includes(MIDDLEWARES.forwardAuth)
-					url[0] = `http${entryPoints.includes(ENTRYPOINTS.WEB_SECURE) ? 's' : ''}://${'85.214.37.62'/*url[0]*/}`
-					return {name,url:url.join('/'),expectedCode,useAuth}
+					url[0] = `http${entryPoints.includes(ENTRYPOINTS.WEB_SECURE) ? 's' : ''}://${url[0]}`
+					const result = {name,url:url.join('/'),useAuth}
+					for(const key in Object.keys(service).filter(key => !ignoredKeys.includes(key))){
+						if(key in service) result[key] = service[key]
+					}
+					return result
 				})
-				fs.writeFileSync(PATH.join(dir,'traefikServices.js'),`module.exports = ${JSON.stringify(content)}`)
+				fs.writeFileSync(PATH.join(dir,'exported.js'),`module.exports = ${JSON.stringify(content)}`)
 				console.log('Finished export of services')
 			})
 		}
