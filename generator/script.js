@@ -111,7 +111,7 @@ generate().then(({json,services}) => {
 					const useAuth = middlewares.includes(MIDDLEWARES.forwardAuth)
 					url[0] = `http${entryPoints.includes(ENTRYPOINTS.WEB_SECURE) ? 's' : ''}://${url[0]}`
 					const result = {name,url:url.join('/'),useAuth}
-					for(const key in Object.keys(service).filter(key => !ignoredKeys.includes(key))){
+					for(const key of Object.keys(service).filter(key => !ignoredKeys.includes(key))){
 						if(key in service) result[key] = service[key]
 					}
 					return result
