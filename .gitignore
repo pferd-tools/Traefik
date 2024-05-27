@@ -7,5 +7,5 @@ compose-traefik.yml
 compse-forwardAuth.yml
 config/acme.json
 .env
-config/dynamicConf.yml
+config/dynamicConf.yml*
 generated-*
