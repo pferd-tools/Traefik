@@ -82,11 +82,11 @@ if ! test -f "$SERVICES_CONFIG_FILE"; then
   echo "Die Services Config Datei existiert nicht. Es werden keine benutzerdefinierten Services generiert."
   echo "Die Datei wird in $SERVICES_CONFIG_FILE erstellt"
   printf "\n"
-  sudo touch "$SERVICES_CONFIG_FILE"
+  touch "$SERVICES_CONFIG_FILE"
 fi
 
 if [[ ! -f "$SERVICES_EXPORTED_FILE" ]] && [[ "$SERVICES_EXPORTED_FILE" != "/dev/null" ]]; then
-  sudo touch "$SERVICES_EXPORTED_FILE"
+  touch "$SERVICES_EXPORTED_FILE"
 fi
 
 if [ -z "$PROJECT_NAME" ]; then
