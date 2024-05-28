@@ -107,10 +107,10 @@ generate().then(({json,services}) => {
 			const ignoredKeys = ['name','displayName','entryPoints','middlewares','url','servers']
 			fs.ensureDir(dir).then(() => {
 				const content = services.map(service => {
-					const {displayName:name,entryPoints,url,middlewares = []} = service
+					const {displayName:name,name:id,entryPoints,url,middlewares = []} = service
 					const useAuth = middlewares.includes(MIDDLEWARES.forwardAuth)
 					url[0] = `http${entryPoints.includes(ENTRYPOINTS.WEB_SECURE) ? 's' : ''}://${url[0]}`
-					const result = {name,url:url.join('/'),useAuth}
+					const result = {id,name,url:url.join('/'),useAuth}
 					for(const key of Object.keys(service).filter(key => !ignoredKeys.includes(key))){
 						if(key in service) result[key] = service[key]
 					}
