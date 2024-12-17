@@ -13,6 +13,7 @@ headers:
     - content-type
     - origin
     - referer
+    - x-service
   accessControlAllowOriginList:
     - "*"
   accessControlMaxAge: 100

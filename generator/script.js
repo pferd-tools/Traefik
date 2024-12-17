@@ -25,6 +25,9 @@ async function generate(){
 			if(Array.isArray(userServices)){
 				userServices.forEach(service => {
 					const overwriteService = services.find(defService => defService.name === service.name)
+					if(service.middlewares.includes(MIDDLEWARES.forwardAuth) && !service.middlewares.includes(MIDDLEWARES.addCors)) {
+						service.middlewares.unshift(MIDDLEWARES.addCors)
+					}
 					if(overwriteService){
 						for(const key in service){
 							const value = service[key]

@@ -1,11 +1,12 @@
-version: "3.9"
 services:
   auth:
     hostname: traefikAuth
     container_name: traefik-auth
-    build: forwardAuth
+    build:
+      dockerfile: forwardAuth/Dockerfile
     volumes:
       - ./forwardAuth:/usr/src/app
+      - ${SERVICES_CONFIG_FILE}:/usr/src/services.js
       - /usr/src/app/node_modules
     env_file: .env
     networks:

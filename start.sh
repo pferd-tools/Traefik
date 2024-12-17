@@ -79,8 +79,8 @@ SERVICES_EXPORTED_FILE=$(extractEnvVariable "SERVICES_EXPORTED_FILE")
 #!/bin/bash
 
 if ! test -f "$SERVICES_CONFIG_FILE"; then
-  echo "Die Services Config Datei existiert nicht. Es werden keine benutzerdefinierten Services generiert."
-  echo "Die Datei wird in $SERVICES_CONFIG_FILE erstellt"
+  echo "No services Config file found. No user defined services will be generated."
+  echo "The file will be written to $SERVICES_CONFIG_FILE"
   printf "\n"
   touch "$SERVICES_CONFIG_FILE"
 fi
