@@ -38,6 +38,7 @@ services:
       - "80:80"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
       - ./config:/etc/traefik
       - ./logs:/var/logs
     networks:
