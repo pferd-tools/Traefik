@@ -124,10 +124,10 @@ else
       if [ $USE_TEST == true ]; then
         echo "Building test container"
         sed "s/\${NETWORK_NAME}/$NETWORK_NAME/g" compose-test.template.yml > generated-compose-test.yml
-        docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" up -d --build
+        docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" up -d --force-recreate
       else
         if [ -f "generated-compose-test.yml" ]; then
-          docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" down --build
+          docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" down --force-recreate
           rm -f generated-compose-test.yml
         fi
       fi
@@ -144,7 +144,7 @@ else
           sed "s/\${NETWORK_NAME}/$NETWORK_NAME/g" compose-traefik.template.yml > generated-compose-traefik.yml
 
           logger "Running compose file"
-          docker-compose -f generated-compose-traefik.yml -p "$PROJECT_NAME" up -d --build
+          docker-compose -f generated-compose-traefik.yml -p "$PROJECT_NAME" up -d --force-recreate
       fi
       else
         logger "generation done"
