@@ -32,13 +32,14 @@ export default function (server, _, done) {
     server.get('/cookie', async (req, res) => {
         try {
             const domain = req.headers.origin?.split('//')[1]
-            if(checkServiceExists(domain)) {
+            if(checkServiceExists(domain) && 'slug' in req.query) {
                 const data = {
-                    _id: domain,
-                    value: generatePassword()
+                    _id: domain+req.query.slug,
+                    value: generatePassword(),
+                    started: new Date()
                 }
                 await upsert(data, COLLECTIONS.services)
-                const cookie = getCookie(data.value, domain)
+                const cookie = getCookie(data.value, domain, req.query.slug)
                 res.header('Set-Cookie', cookie)
                 res.status(200).send(cookie)
             }

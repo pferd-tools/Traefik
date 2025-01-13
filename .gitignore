@@ -10,3 +10,4 @@ config/acme.json
 .env
 config/dynamicConf.yml*
 generated-*
+letsencrypt

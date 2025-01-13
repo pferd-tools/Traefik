@@ -31,10 +31,14 @@ export async function authenticate(headers) {
         }
         else if (isServiceAuth && (checkServiceExists(host) || checkServiceExists(referer))) {
             try {
-                const domain = serviceCookie.split(';').find(part => part.trim().startsWith('Domain'))?.split('=')[1]
+                const getValueFromCookie = (value) => {
+                    return serviceCookie.split(';').find(part => part.trim().startsWith(value))?.split('=')[1]
+                }
+                const domain = getValueFromCookie('Domain')
                 if(domain) {
+                    const _id = domain + getValueFromCookie('Path')
                     const key = unsign(parse(serviceCookie)[SERVICE_AUTH_KEY], process.env.SECRET).value
-                    const stored = (await getDocument(COLLECTIONS.services, {_id: domain}, {_id: 0, value: 1}, false)).value
+                    const stored = (await getDocument(COLLECTIONS.services, {_id}, {_id: 0, value: 1}, false)).value
                     if(key === stored) {
                         return {
                             code: 200,
@@ -114,12 +118,13 @@ export function checkServiceExists(serviceName) {
     return services.some(service => service.url.includes(serviceName))
 }
 
-export function getCookie(value, domain) {
+export function getCookie(value, domain, slug) {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: 'Strict'
+        sameSite: 'None',
     }
     if(domain) options.domain = domain
+    if(slug) options.path = slug
     return serialize('serviceAuth',sign(value, process.env.SECRET), options)
 }
