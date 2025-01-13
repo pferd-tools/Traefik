@@ -124,10 +124,10 @@ else
       if [ $USE_TEST == true ]; then
         echo "Building test container"
         sed "s/\${NETWORK_NAME}/$NETWORK_NAME/g" compose-test.template.yml > generated-compose-test.yml
-        docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" up -d
+        docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" up -d --build
       else
         if [ -f "generated-compose-test.yml" ]; then
-          docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" down
+          docker-compose -f generated-compose-test.yml -p "$PROJECT_NAME" down --build
           rm -f generated-compose-test.yml
         fi
       fi
