@@ -1,6 +1,5 @@
 import { MongoClient, ServerApiVersion } from 'mongodb'
-import jwt from 'jsonwebtoken'
-import {getHashString, getRandomPassword, getServiceAuth, hash} from "./functions.js";
+import {getHashString, hash} from "./functions.js";
 
 export const COLLECTIONS = {
     users: 'users',
@@ -23,6 +22,14 @@ export async function connectDB(){
 
 export async function save(payload, collection = COLLECTIONS.users){
     await db.collection(collection).insertOne(payload)
+}
+
+export async function upsert(payload, collection = COLLECTIONS.users){
+    const update = {}
+    for(const key in payload) {
+        update[key] = payload[key]
+    }
+    await db.collection(collection).updateOne({_id: payload._id},{$set: update}, {upsert: true})
 }
 
 export async function getDocument(collection, query = {}, projection = {}, forceArray = false) {
@@ -53,7 +60,7 @@ export async function getUsersList(){
     }
 }
 
-export async function updateUser(name,password){
+export async function updateUser(name, password){
     let returnObj
     const newUser = {
         name,
@@ -76,21 +83,4 @@ export async function updateUser(name,password){
     }
 
     return returnObj
-}
-
-export async function registerProtectedService(serviceName) {
-    const password = getRandomPassword()
-    const auth = await hash(getHashString(serviceName,getServiceAuth(password)))
-    try {
-        const service = await getDocument(COLLECTIONS.services, {_id: serviceName}, {_id: 1})
-        await db.collection(COLLECTIONS.services).updateOne({_id: service._id},{$set:{auth}})
-    }
-    catch (e) {
-        await save({
-            _id: serviceName,
-            auth
-        }, COLLECTIONS.services)
-    }
-
-    return await jwt.sign([serviceName,password].join(':'), process.env.SECRET)
 }

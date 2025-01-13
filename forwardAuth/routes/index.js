@@ -1,6 +1,13 @@
-import {authenticate, defaultErrorCode, getUser, verifyMaster} from "../scripts/functions.js";
-import {deleteDocument, registerProtectedService, updateUser} from "../scripts/database.js";
-import services from '/usr/src/services.js'
+import {
+    authenticate,
+    checkServiceExists,
+    defaultErrorCode,
+    getCookie,
+    getUser,
+    verifyMaster
+} from "../scripts/functions.js";
+import {COLLECTIONS, deleteDocument, updateUser, upsert} from "../scripts/database.js";
+import generatePassword from "password-generator";
 
 export default function (server, _, done) {
     server.get('/', async (req, res) => {
@@ -12,26 +19,32 @@ export default function (server, _, done) {
         res.status(code).send(msg)
     });
 
-    server.get('/register/:service', async (req, res) => {
+    server.get('/user', async (req, res) => {
         try {
             verifyMaster(req.headers)
-            const service = req.params.service
-            const serviceNames = services.map(service => service.name)
-            if(serviceNames.includes(service)) {
-                res.status(200).send(await registerProtectedService(service))
-            }
-            else res.status(409).send(`Service "${service}" not found`)
+            res.status(200).send(await getUser())
         } catch (err) {
             const {code, msg} = err
             res.status(code).send(msg)
         }
     });
 
-    server.get('/user', async (req, res) => {
+    server.get('/cookie', async (req, res) => {
         try {
-            verifyMaster(req.headers)
-            res.status(200).send(await getUser())
+            const domain = req.headers.origin?.split('//')[1]
+            if(checkServiceExists(domain)) {
+                const data = {
+                    _id: domain,
+                    value: generatePassword()
+                }
+                await upsert(data, COLLECTIONS.services)
+                const cookie = getCookie(data.value, domain)
+                res.header('Set-Cookie', cookie)
+                res.status(200).send(cookie)
+            }
+            res.status(400).send('Cannot generate authentication!')
         } catch (err) {
+            console.log(err);
             const {code, msg} = err
             res.status(code).send(msg)
         }

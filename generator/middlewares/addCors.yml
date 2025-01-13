@@ -14,9 +14,8 @@ headers:
     - origin
     - referer
     - x-service
-  accessControlAllowOriginList:
-    - "*"
+  accessControlAllowOriginListRegex:
+    - ".*\\.localhost"
+    - ".*\\.services-pferd.com"
   accessControlMaxAge: 100
   addVaryHeader: true
-  customResponseHeaders:
-    Access-Control-Allow-Origin: "*"
