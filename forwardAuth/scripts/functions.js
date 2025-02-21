@@ -17,7 +17,10 @@ export async function authenticate(headers) {
     } = headers
     const isServiceAuth = !!serviceCookie
     const isWs = headers['sec-fetch-mode'] === 'websocket'
-    const isAssetUri = new RegExp(`/assets/index-.*\.(js|css)`).test(uri) || uri.startsWith('/favicon/') || /\/logo\.(jpg|png|webp)/.test(uri)
+    let isAssetUri = false
+    if(uri) {
+        isAssetUri = new RegExp(`/assets/index-.*\.(js|css)`).test(uri) || uri.startsWith('/favicon/') || /\/logo\.(jpg|png|webp)/.test(uri)
+    }
     const authReturn = {
         code:  isServiceAuth ? 403 : defaultErrorCode,
         msg: isServiceAuth ? 'Not authorized to access this resource' : 'No authorization possible. Please check your credentials'
