@@ -2,12 +2,15 @@ import {
     authenticate,
     checkServiceExists,
     defaultErrorCode,
-    getCookie,
     getUser,
     verifyMaster
 } from "../scripts/functions.js";
 import {COLLECTIONS, deleteDocument, updateUser, upsert} from "../scripts/database.js";
 import generatePassword from "password-generator";
+
+export const REGISTRATION_TYPES = {
+    TOKEN: 'token'
+}
 
 export default function (server, _, done) {
     server.get('/', async (req, res) => {
@@ -29,19 +32,23 @@ export default function (server, _, done) {
         }
     });
 
-    server.get('/cookie', async (req, res) => {
+    server.get('/register/:type', async (req, res) => {
         try {
+            const type = req.params.type
+            if(!Object.values(REGISTRATION_TYPES).includes(type)) {
+                return res.status(400).send(`Registration type "${type}" not supported!`)
+            }
             const domain = req.headers.origin?.split('//')[1]
-            if(checkServiceExists(domain) && 'slug' in req.query) {
+            const isMemorable = (req.query.memorable === 'true') || false
+            if(checkServiceExists(domain)) {
                 const data = {
-                    _id: domain+req.query.slug,
-                    value: generatePassword(),
-                    started: new Date()
+                    _id: domain,
+                    value: generatePassword(req.query.length || 20, isMemorable),
+                    type,
+                    registered: new Date()
                 }
                 await upsert(data, COLLECTIONS.services)
-                const cookie = getCookie(data.value, domain, req.query.slug)
-                res.header('Set-Cookie', cookie)
-                res.status(200).send(cookie)
+                res.status(200).send(data.value)
             }
             res.status(400).send('Cannot generate authentication!')
         } catch (err) {
