@@ -5,8 +5,9 @@ import {
     getUser,
     verifyMaster
 } from "../scripts/functions.js";
-import {COLLECTIONS, deleteDocument, updateUser, upsert} from "../scripts/database.js";
+import {COLLECTIONS, deleteDocument, getDocument, updateUser, upsert} from "../scripts/database.js";
 import generatePassword from "password-generator";
+import jwt from 'jsonwebtoken'
 
 export const REGISTRATION_TYPES = {
     TOKEN: 'token'
@@ -41,14 +42,25 @@ export default function (server, _, done) {
             const domain = req.headers.origin?.split('//')[1]
             const isMemorable = (req.query.memorable === 'true') || false
             if(checkServiceExists(domain)) {
+                const query = {domain}
+                let _id
+                try {
+                    _id = (await getDocument(COLLECTIONS.services,query))._id
+                }
+                catch (e) {
+                    _id = generatePassword(5, true)
+                }
                 const data = {
-                    _id: domain,
+                    _id,
                     value: generatePassword(req.query.length || 20, isMemorable),
-                    type,
+                    domain,
                     registered: new Date()
                 }
                 await upsert(data, COLLECTIONS.services)
-                res.status(200).send(data.value)
+                res.status(200).send(await jwt.sign({
+                    service: data._id,
+                    value: data.value
+                }, process.env.SECRET))
             }
             res.status(400).send('Cannot generate authentication!')
         } catch (err) {

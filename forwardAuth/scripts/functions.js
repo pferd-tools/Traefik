@@ -2,6 +2,7 @@ import argon2 from "argon2";
 import {COLLECTIONS, getDocument, getUsersList} from './database.js'
 import services from '/usr/src/services.js'
 import {REGISTRATION_TYPES} from "../routes/index.js";
+import jwt from "jsonwebtoken";
 
 const base = '$argon2id$v=19$m=65536,t=3,p=4$'
 
@@ -13,7 +14,7 @@ export async function authenticate(headers) {
         'x-forwarded-uri': uri,
         'x-service': serviceHeader
     } = headers
-    const isServiceAuth = !!serviceHeader && serviceHeader.startsWith('http')
+    const isServiceAuth = !!serviceHeader
     const isWs = headers['sec-fetch-mode'] === 'websocket'
     let isAssetUri = false
     if(uri) {
@@ -30,16 +31,11 @@ export async function authenticate(headers) {
                 msg: 'Go ahead'
             }
         }
-        else if (isServiceAuth && checkServiceExists(serviceHeader.split('//')[1])) {
+        else if (isServiceAuth) {
             try {
-                let isAuth = false
-                const service = (await getDocument(COLLECTIONS.services, {
-                    _id: serviceHeader.split('//')[1]
-                }, {_id: 0, value: 1, type: 1}, false))
-                if(service.type === REGISTRATION_TYPES.TOKEN) {
-                    isAuth = authHeader.split(' ')[1] === service.value
-                }
-                if(isAuth) {
+                const {service, value} = await jwt.verify(serviceHeader, process.env.SECRET)
+                const serviceDoc = (await getDocument(COLLECTIONS.services, {_id: service}, {_id: 0, value: 1, domain: 1}, false))
+                if(serviceDoc && checkServiceExists(serviceDoc.domain) && value === serviceDoc.value) {
                     return {
                         code: 200,
                         msg: 'Services can go'

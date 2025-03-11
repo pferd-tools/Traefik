@@ -25,11 +25,16 @@ export async function save(payload, collection = COLLECTIONS.users){
 }
 
 export async function upsert(payload, collection = COLLECTIONS.users){
-    const update = {}
-    for(const key in payload) {
-        update[key] = payload[key]
+    try {
+        await db.collection(collection).updateOne({_id: payload._id},{$set: payload}, {upsert: true})
     }
-    await db.collection(collection).updateOne({_id: payload._id},{$set: update}, {upsert: true})
+    catch (e) {
+        if(e.code === 66) {
+            delete payload._id
+            await upsert(payload,collection)
+        }
+        else throw e
+    }
 }
 
 export async function getDocument(collection, query = {}, projection = {}, forceArray = false) {
