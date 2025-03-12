@@ -1,17 +1,12 @@
 import {
     authenticate,
     checkServiceExists,
-    defaultErrorCode,
+    defaultErrorCode, getServiceHeader, getServiceToken,
     getUser,
     verifyMaster
 } from "../scripts/functions.js";
 import {COLLECTIONS, deleteDocument, getDocument, updateUser, upsert} from "../scripts/database.js";
 import generatePassword from "password-generator";
-import jwt from 'jsonwebtoken'
-
-export const REGISTRATION_TYPES = {
-    TOKEN: 'token'
-}
 
 export default function (server, _, done) {
     server.get('/', async (req, res) => {
@@ -33,13 +28,21 @@ export default function (server, _, done) {
         }
     });
 
-    server.get('/register/:type', async (req, res) => {
-        try {
-            const type = req.params.type
-            if(!Object.values(REGISTRATION_TYPES).includes(type)) {
-                return res.status(400).send(`Registration type "${type}" not supported!`)
+    server.get('/token', async (req, res) => {
+        const domain = getServiceHeader(req.headers)?.split('//')[1]
+        if(checkServiceExists(domain) && 'authorization' in req.headers) {
+            const auth = req.headers.authorization.split('Bearer')[1].trim()
+            const service = await getDocument(COLLECTIONS.services,{domain}, {_id:1, value:1})
+            if(service.value === auth) {
+                return res.status(200).send(await getServiceToken(service))
             }
-            const domain = req.headers.origin?.split('//')[1]
+        }
+        res.status(400).send('Service unknown!')
+    })
+
+    server.post('/token', async (req, res) => {
+        try {
+            const domain = getServiceHeader(req.headers)?.split('//')[1]
             const isMemorable = (req.query.memorable === 'true') || false
             if(checkServiceExists(domain)) {
                 const query = {domain}
@@ -57,10 +60,7 @@ export default function (server, _, done) {
                     registered: new Date()
                 }
                 await upsert(data, COLLECTIONS.services)
-                res.status(200).send(await jwt.sign({
-                    service: data._id,
-                    value: data.value
-                }, process.env.SECRET))
+                res.status(200).send(await getServiceToken(data))
             }
             res.status(400).send('Cannot generate authentication!')
         } catch (err) {

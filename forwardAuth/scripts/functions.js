@@ -1,7 +1,6 @@
 import argon2 from "argon2";
 import {COLLECTIONS, getDocument, getUsersList} from './database.js'
 import services from '/usr/src/services.js'
-import {REGISTRATION_TYPES} from "../routes/index.js";
 import jwt from "jsonwebtoken";
 
 const base = '$argon2id$v=19$m=65536,t=3,p=4$'
@@ -12,9 +11,10 @@ export async function authenticate(headers) {
     const {
         authorization: authHeader,
         'x-forwarded-uri': uri,
-        'x-service': serviceHeader
     } = headers
+    const serviceHeader = getServiceHeader(headers)
     const isServiceAuth = !!serviceHeader
+
     const isWs = headers['sec-fetch-mode'] === 'websocket'
     let isAssetUri = false
     if(uri) {
@@ -111,4 +111,15 @@ export async function getUser() {
 
 export function checkServiceExists(serviceName) {
     return services.some(service => service.url.includes(serviceName))
+}
+
+export async function getServiceToken(data) {
+    return await jwt.sign({
+        service: data._id,
+        value: data.value
+    }, process.env.SECRET)
+}
+
+export function getServiceHeader(headers) {
+    return headers['x-service']
 }
