@@ -2,7 +2,7 @@ services:
   traefik-generator:
     build: generator
     env_file: .env
-    restart: 'no'
+    restart: no
     volumes:
       - ./config:/usr/src/traefik
       - ${SERVICES_CONFIG_FILE}:/usr/src/app/services.js

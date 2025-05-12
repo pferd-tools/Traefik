@@ -1,6 +1,7 @@
 services:
   auth:
     hostname: traefikAuth
+    restart: always
     container_name: traefik-auth
     build:
       dockerfile: forwardAuth/Dockerfile
